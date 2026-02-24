@@ -14,7 +14,39 @@ public static class UpdateManager
     private static readonly string AppImagesPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader", "app-images");
     
     private readonly record struct Asset(Repo Repo, string TempAssetPath);
-    
+
+    public static async Task<Repo?> AddRepo(string publisherName, string repoName)
+    {
+        string url = $"https://api.github.com/repos/{publisherName}/{repoName}/releases/latest";
+        string repoUrl = $"https://api.github.com/repos/{publisherName}/{repoName}";
+        
+        HttpResponseMessage httpRepoResponse = await Api.GetRequest(repoUrl, FileManager.GetPat());
+        if (httpRepoResponse == null || !httpRepoResponse.IsSuccessStatusCode)
+        {
+            Logger.LogE($"Failed to fetch repo: {repoUrl}");
+            return null;
+        }
+        
+        HttpResponseMessage httpResponse = await Api.GetRequest(url, FileManager.GetPat());
+        if (httpResponse == null || !httpResponse.IsSuccessStatusCode)
+        {
+            
+            Logger.LogE($"Failed to fetch release of: {url}");
+            return null;
+        }
+        
+        RepoResponse repoResponse = JsonSerializer.Deserialize<RepoResponse>(await httpRepoResponse.Content.ReadAsStringAsync());
+        Response response = JsonSerializer.Deserialize<Response>(await httpResponse.Content.ReadAsStringAsync());
+
+        Repo repo = new()
+        {
+            Url = url,
+            Name = repoResponse.full_name,
+            Description = repoResponse.description
+        };
+
+        return repo;
+    }
 
     public static async Task UpdateRepoDetails(List<Repo> repos)
     {

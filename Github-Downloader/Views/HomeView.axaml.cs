@@ -1,8 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -91,44 +89,24 @@ public partial class HomeView : UserControl
             publisherName = TbxOwner.Text;
             repoName = TbxRepo.Text;
         }
-        
-        string url = $"https://api.github.com/repos/{publisherName}/{repoName}/releases/latest";
-        string repoUrl = $"https://api.github.com/repos/{publisherName}/{repoName}";
-        
-        HttpResponseMessage httpRepoResponse = await Api.GetRequest(repoUrl, FileManager.GetPat());
-        if (httpRepoResponse == null || !httpRepoResponse.IsSuccessStatusCode)
+
+        Repo repo = await UpdateManager.AddRepo(publisherName, repoName);
+
+        if (repo == null)
         {
             Console.WriteLine("Failed to fetch repo");
-            ToastText.Text = $"Failed to fetch repo: {repoUrl}";
-            Logger.LogE($"Failed to fetch repo: {repoUrl}");
+            ToastText.Text = $"Failed to fetch repo: {publisherName} {repoName}";
             ToastPopup.IsOpen = true;
             await Task.Delay(2500);
             ToastPopup.IsOpen = false;
-            return;
-        }
-        
-        HttpResponseMessage httpResponse = await Api.GetRequest(url, FileManager.GetPat());
-        if (httpResponse == null || !httpResponse.IsSuccessStatusCode)
-        {
+            
             Console.WriteLine("Failed to fetch releases");
-            ToastText.Text = $"Failed to fetch release of: {url}";
-            Logger.LogE($"Failed to fetch release of: {url}");
+            ToastText.Text = $"Failed to fetch release of: {publisherName} {repoName}";
             ToastPopup.IsOpen = true;
             await Task.Delay(2500);
             ToastPopup.IsOpen = false;
-            return;
         }
         
-        RepoResponse repoResponse = JsonSerializer.Deserialize<RepoResponse>(await httpRepoResponse.Content.ReadAsStringAsync());
-        Response response = JsonSerializer.Deserialize<Response>(await httpResponse.Content.ReadAsStringAsync());
-
-        Repo repo = new()
-        {
-            Url = url,
-            Name = repoResponse.full_name,
-            Description = repoResponse.description
-        };
-
         _downloadStatusViewModel.IsUpdating = true;
         await UpdateManager.SearchForUpdates(repo, statusText =>
         {
@@ -139,6 +117,7 @@ public partial class HomeView : UserControl
         UpdateManager.Repos.Add(repo);
 
         FileManager.SaveRepos();
+        
         CreateTrackedRepoEntry(repo);
 
         TbxUrl.Text = "";
