@@ -46,6 +46,15 @@ public static class FileManager
         await UpdateManager.SearchForUpdates(UpdateManager.Repos, statusText);
         SaveRepos();
     }
+
+    public static void SetPat(string pat)
+    {
+        if (string.IsNullOrEmpty(pat))
+        {
+            return;
+        }
+        File.WriteAllText(PatFilePath, pat);
+    }
     
     public static string GetPat()
     {

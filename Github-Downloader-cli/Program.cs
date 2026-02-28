@@ -27,14 +27,14 @@ public static class Program
             ShowHelpPage();
             return;
         }
-        
+
         switch (args[0])
         {
             case "-h":
             case "--help":
                 ShowHelpPage();
                 break;
-            
+
             case "list":
                 if (args.Length <= 1)
                 {
@@ -48,8 +48,9 @@ public static class Program
                         {
                             Console.WriteLine($"{i} - {UpdateManager.Repos[i]}");
                         }
+
                         break;
-                    
+
                     case "assets":
                         if (args.Length <= 2)
                         {
@@ -65,7 +66,7 @@ public static class Program
                             Console.WriteLine($"repo id {repoId} out of range");
                             return;
                         }
-                        
+
                         for (int i = 0; i < UpdateManager.Repos[repoId].AssetNames.Count; i++)
                         {
                             string assetName = UpdateManager.Repos[repoId].AssetNames[i];
@@ -73,18 +74,56 @@ public static class Program
                             {
                                 Console.Write("\x1b[32m");
                             }
+
                             Console.WriteLine(i + " - " + assetName);
                             if (i == UpdateManager.Repos[repoId].DownloadAssetIndex)
                             {
                                 Console.Write("\x1b[0m");
                             }
                         }
+
                         break;
-                    
+
                     default:
                         Console.WriteLine("Not a valid command");
                         break;
                 }
+
+                break;
+
+            case "add":
+                Repo? repo;
+                switch (args.Length)
+                {
+                    case 2:
+                        string repoUrl = args[1];
+                        repo = await UpdateManager.AddRepo(repoUrl);
+                        break;
+
+                    case 3:
+                        string publisherName = args[1];
+                        string repoName = args[2];
+                        repo = await UpdateManager.AddRepo(publisherName, repoName);
+                        break;
+
+                    default:
+                        Console.WriteLine("Invalid arguments");
+                        return;
+                        break;
+                }
+
+                if (repo == null)
+                {
+                    Console.WriteLine("Failed to find repo");
+                    return;
+                }
+
+                Console.WriteLine("Added repo");
+
+                await UpdateManager.SearchForUpdates(repo, Console.WriteLine);
+                
+                UpdateManager.Repos.Add(repo);
+                FileManager.SaveRepos();
                 break;
             
             case "check":
@@ -99,8 +138,9 @@ public static class Program
                 });
                 Console.WriteLine($"{count} updates available execute {cliName} list to view details");
                 break;
-            
+
             case "update":
+            {
                 if (args.Length <= 1)
                 {
                     return;
@@ -108,17 +148,23 @@ public static class Program
 
                 if (args[1] == "--all")
                 {
-                    await UpdateManager.UpdateRepos(UpdateManager.Repos, statusText =>
-                    {
-                        Console.WriteLine("statusText: " + statusText);
-                    }, progressText =>
-                    {
-                        Console.WriteLine("progressText: " + progressText);
-                    });
+                    await UpdateManager.UpdateRepos(UpdateManager.Repos,
+                        Console.WriteLine,
+                        Console.WriteLine);
                     FileManager.SaveRepos();
+                    return;
                 }
+
+                int repoId = int.Parse(args[1]);
+                
+                await UpdateManager.UpdateRepo(UpdateManager.Repos[repoId],
+                    Console.WriteLine,
+                    Console.WriteLine);
+                FileManager.SaveRepos();
+
                 break;
-            
+            }
+
             case "repo":
                 if (args.Length <= 1)
                 {
@@ -154,6 +200,54 @@ public static class Program
                         break;
                 }
                 break;
+
+            case "remove":
+            {
+                if (args.Length <= 1)
+                {
+                    return;
+                }
+
+                int repoId = int.Parse(args[1]);
+
+                if (repoId < 0 || repoId >= UpdateManager.Repos.Count)
+                {
+                    Console.WriteLine($"repo id {repoId} out of range");
+                    return;
+                }
+                
+                UpdateManager.Repos.RemoveAt(repoId);
+                FileManager.SaveRepos();
+                break;
+            }
+            
+            case "pat":
+                if (args.Length <= 1)
+                {
+                    return;
+                }
+
+                switch (args[1])
+                {
+                    case "set":
+                        if (args.Length <= 2)
+                        {
+                            Console.WriteLine($"Specify personal access token: {cliName} pat set (personal access token)");
+                            return;
+                        }
+                        
+                        FileManager.SetPat(args[3]);
+                        break;
+                    
+                    case "remove":
+                        FileManager.SetPat("");
+                        break;
+                }
+                break;
+            
+            default:
+                Console.WriteLine("invalid arguments");
+                break;
         }
     }
 
@@ -169,8 +263,15 @@ public static class Program
                             
                             list repos - List all tracked repositories
                             list assets (repo id) - List all available assets of a specific repo
+                            repo (repo id) set-asset (asset id) - Select specific asset to download from repository by id
+                            add (repo link) - Add a repository with github-link of repository
+                            add add (publisher name) (repo name) - Add a repository with publisher-name and repository-name
+                            remove (repo id) - Remove repository by id
                             check - Check for available updates
                             update --all - Update all repositories if updates available
+                            update (repo id) - Update specific repository by id
+                            pat set (pat) - Set a personal access token to access private repositories and increase rate-limit
+                            pat remove - Remove personal access token
 
                            """);
     }

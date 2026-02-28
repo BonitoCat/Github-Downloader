@@ -17,6 +17,26 @@ public static class UpdateManager
     
     private readonly record struct Asset(Repo Repo, string TempAssetPath);
 
+    public static async Task<Repo?> AddRepo(string repoUrl)
+    {
+        string publisherName = "";
+        string repoName = "";
+        
+        try
+        {
+            string[] values = repoUrl.Split("github.com/");
+            string[] values2 = values[1].TrimEnd('/').Split("/");
+            publisherName = values2[0];
+            repoName = values2[1];
+        }
+        catch (Exception) {
+            Logger.LogE($"Failed to parse url: {repoUrl}");
+            return null;
+        }
+
+        return await AddRepo(publisherName, repoName);
+    }
+    
     public static async Task<Repo?> AddRepo(string publisherName, string repoName)
     {
         string url = $"https://api.github.com/repos/{publisherName}/{repoName}/releases/latest";
@@ -29,17 +49,8 @@ public static class UpdateManager
             return null;
         }
         
-        HttpResponseMessage httpResponse = await Api.GetRequest(url, FileManager.GetPat());
-        if (httpResponse == null || !httpResponse.IsSuccessStatusCode)
-        {
-            
-            Logger.LogE($"Failed to fetch release of: {url}");
-            return null;
-        }
-        
         RepoResponse repoResponse = JsonSerializer.Deserialize<RepoResponse>(await httpRepoResponse.Content.ReadAsStringAsync());
-        Response response = JsonSerializer.Deserialize<Response>(await httpResponse.Content.ReadAsStringAsync());
-
+        
         Repo repo = new()
         {
             Url = url,

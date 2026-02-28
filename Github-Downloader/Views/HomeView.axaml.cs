@@ -68,40 +68,26 @@ public partial class HomeView : UserControl
 
     private async void BtnAddRepo_OnClick(object? sender, RoutedEventArgs e)
     {
-        string publisherName = "";
-        string repoName = "";
+        Repo repo;
         if (!string.IsNullOrEmpty(TbxUrl.Text))
         {
-            try
-            {
-                string[] values = TbxUrl.Text.Split("github.com/");
-                string[] values2 = values[1].TrimEnd('/').Split("/");
-                publisherName = values2[0];
-                repoName = values2[1];
-            }
-            catch (Exception) {
-                Console.WriteLine($"Failed to parse url: {TbxUrl.Text}");
-                Logger.LogE($"Failed to parse url: {TbxUrl.Text}");
-            }
+            repo = await UpdateManager.AddRepo(TbxUrl.Text);
         }
         else
         {
-            publisherName = TbxOwner.Text;
-            repoName = TbxRepo.Text;
+            repo = await UpdateManager.AddRepo(TbxOwner.Text, TbxRepo.Text);
         }
-
-        Repo repo = await UpdateManager.AddRepo(publisherName, repoName);
 
         if (repo == null)
         {
             Console.WriteLine("Failed to fetch repo");
-            ToastText.Text = $"Failed to fetch repo: {publisherName} {repoName}";
+            ToastText.Text = $"Failed to fetch repo: {TbxOwner.Text} {TbxRepo.Text}";
             ToastPopup.IsOpen = true;
             await Task.Delay(2500);
             ToastPopup.IsOpen = false;
             
             Console.WriteLine("Failed to fetch releases");
-            ToastText.Text = $"Failed to fetch release of: {publisherName} {repoName}";
+            ToastText.Text = $"Failed to fetch release of: {TbxOwner.Text} {TbxRepo.Text}";
             ToastPopup.IsOpen = true;
             await Task.Delay(2500);
             ToastPopup.IsOpen = false;
@@ -326,11 +312,7 @@ public partial class HomeView : UserControl
 
     private async void BtnSetPat_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrEmpty(TbxPat.Text))
-        {
-            return;
-        }
-        File.WriteAllText(_mainViewModel.PatFilePath, TbxPat.Text);
+        FileManager.SetPat(TbxPat.Text);
         TbxPat.Text = "";
         ToastText.Text = "Personal access token saved successfully!";
         ToastPopup.IsOpen = true;
