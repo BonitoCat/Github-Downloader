@@ -1,5 +1,17 @@
 read -p "Enter new version number: " NEW_VERSION
 
+dotnet restore ../Github-Downloader-cli/Github-Downloader-cli.csproj -r linux-x64
+dotnet publish ../Github-Downloader-cli/Github-Downloader-cli.csproj \
+    --no-restore \
+    -c Release \
+    -r linux-x64 \
+    --self-contained true \
+    --output ./github-downloader-cli-linux-x64/usr/local/bin \
+    /p:PublishSingleFile=true \
+    /p:PublishReadyToRun=true \
+    /p:DebugType=None \
+    /p:DebugSymbols=false
+
 dotnet restore ../Github-Downloader/Github-Downloader.csproj -r linux-x64
 dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     --no-restore \
@@ -73,6 +85,7 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
 
 CONTROL_FILE_X64="./github-downloader-linux-x64/DEBIAN/control"
 CONTROL_FILE_ARM64="./github-downloader-linux-arm64/DEBIAN/control"
+CONTROL_FILE_X64_CLI="./github-downloader-cli-linux-x64/DEBIAN/control"
 
 if [ ! -f "$CONTROL_FILE_X64" ]; then
     echo "Control file not found at $CONTROL_FILE_X64"
@@ -80,6 +93,10 @@ if [ ! -f "$CONTROL_FILE_X64" ]; then
 fi
 if [ ! -f "$CONTROL_FILE_ARM64" ]; then
     echo "Control file not found at $CONTROL_FILE_ARM64"
+    exit 1
+fi
+if [ ! -f "$CONTROL_FILE_X64_CLI" ]; then
+    echo "Control file not found at $CONTROL_FILE_X64_CLI"
     exit 1
 fi
 
@@ -90,12 +107,14 @@ fi
 
 sed -i "s/^Version: .*/Version: $NEW_VERSION/" "$CONTROL_FILE_X64"
 sed -i "s/^Version: .*/Version: $NEW_VERSION/" "$CONTROL_FILE_ARM64"
+sed -i "s/^Version: .*/Version: $NEW_VERSION/" "$CONTROL_FILE_X64_CLI"
 
 
 rm -rf release-assets/*
 
 dpkg-deb --build github-downloader-linux-x64 ./release-assets
 dpkg-deb --build github-downloader-linux-arm64 ./release-assets
+dpkg-deb --build github-downloader-cli-linux-x64 ./release-assets
 
 ARCH=x86_64 ./AppImage-appimagetool.AppImage ./github-downloader-linux-x64-appimage
 mv ./Github_Downloader-x86_64.AppImage release-assets/Github_Downloader-x86_64.AppImage

@@ -153,10 +153,11 @@ public partial class HomeView : UserControl
             _downloadStatusViewModel.IsUpdating = false;
             FileManager.SaveRepos();
         };
-        
+
         TextBlock tbxName = new()
         {
-            DataContext = repo
+            DataContext = repo,
+            VerticalAlignment = VerticalAlignment.Center
         };
         tbxName.Bind(TextBlock.TextProperty, new Binding(nameof(Repo.Name)));
 
@@ -164,7 +165,8 @@ public partial class HomeView : UserControl
         {
             Text = "Version",
             Foreground = Brushes.Orange,
-            DataContext = repo
+            DataContext = repo,
+            VerticalAlignment = VerticalAlignment.Center
         };
         tbxUpdateVersion.Bind(
             TextBlock.TextProperty, 
@@ -182,11 +184,14 @@ public partial class HomeView : UserControl
         TextBlock tbxVersion = new()
         {
             Text = "Version",
-            DataContext = repo
+            DataContext = repo,
+            VerticalAlignment = VerticalAlignment.Center
         };
         tbxVersion.Bind(TextBlock.TextProperty, new Binding(nameof(Repo.CurrentInstallTag)));
         tbxVersion.Bind(IsVisibleProperty, new Binding(nameof(Repo.IsUpToDate)));
 
+        Grid grdRepoLabel = new();
+        
         StackPanel stpRepoLabel = new()
         {
             Orientation = Orientation.Horizontal,
@@ -197,6 +202,8 @@ public partial class HomeView : UserControl
                 tbxUpdateVersion,
             }
         };
+        
+        grdRepoLabel.Children.Add(stpRepoLabel);
 
         Button btnMore = new()
         {
@@ -256,9 +263,9 @@ public partial class HomeView : UserControl
         Grid.SetColumn(ckbUpdate, column++);
         Grid.SetRow(ckbUpdate, GrdTrackedRepos.RowDefinitions.Count - 1);
         GrdTrackedRepos.Children.Add(ckbUpdate);
-        Grid.SetColumn(stpRepoLabel, column++);
-        Grid.SetRow(stpRepoLabel, GrdTrackedRepos.RowDefinitions.Count -1);
-        GrdTrackedRepos.Children.Add(stpRepoLabel);
+        Grid.SetColumn(grdRepoLabel, column++);
+        Grid.SetRow(grdRepoLabel, GrdTrackedRepos.RowDefinitions.Count -1);
+        GrdTrackedRepos.Children.Add(grdRepoLabel);
         Grid.SetColumn(btnMore, column++);
         Grid.SetRow(btnMore, GrdTrackedRepos.RowDefinitions.Count -1);
         GrdTrackedRepos.Children.Add(btnMore);
