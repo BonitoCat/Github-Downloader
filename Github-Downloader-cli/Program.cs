@@ -1,4 +1,5 @@
 ﻿using FileLib;
+using Github_Downloader_cli.Args;
 using Github_Downloader_lib;
 using Github_Downloader_lib.Models;
 using Github_Downloader.Enums;
@@ -8,8 +9,6 @@ namespace Github_Downloader_cli;
 
 public static class Program
 {
-    private const string CliName = "ghd";
-
     private static async Task Main(string[] args)
     {
         Logger.LogDir = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader", "logs");
@@ -17,10 +16,7 @@ public static class Program
 
         UpdateManager.CurPlatform = Platform.Terminal;
         
-        await FileManager.LoadRepos(statusText =>
-        {
-            Console.WriteLine(statusText);
-        });
+        await FileManager.LoadRepos(Console.WriteLine);
 
         if (args.Length == 0)
         {
@@ -41,62 +37,13 @@ public static class Program
                 break;
 
             case "list":
-                if (args.Length <= 1)
-                {
-                    return;
-                }
-
-                switch (args[1])
-                {
-                    case "repos":
-                        for (int i = 0; i < UpdateManager.Repos.Count; i++)
-                        {
-                            Console.WriteLine($"{i} - {UpdateManager.Repos[i]}");
-                        }
-
-                        break;
-
-                    case "assets":
-                        if (args.Length <= 2)
-                        {
-                            Console.WriteLine("\nSpecify repository id:\n\n" +
-                                              $"{CliName} list assets (repo id)\n");
-                            return;
-                        }
-
-                        int repoId = int.Parse(args[2]);
-
-                        if (repoId < 0 || repoId >= UpdateManager.Repos.Count)
-                        {
-                            Console.WriteLine($"repo id {repoId} out of range");
-                            return;
-                        }
-
-                        for (int i = 0; i < UpdateManager.Repos[repoId].AssetNames.Count; i++)
-                        {
-                            string assetName = UpdateManager.Repos[repoId].AssetNames[i];
-                            if (i == UpdateManager.Repos[repoId].DownloadAssetIndex)
-                            {
-                                Console.Write("\x1b[32m");
-                            }
-
-                            Console.WriteLine(i + " - " + assetName);
-                            if (i == UpdateManager.Repos[repoId].DownloadAssetIndex)
-                            {
-                                Console.Write("\x1b[0m");
-                            }
-                        }
-
-                        break;
-
-                    default:
-                        Console.WriteLine("Not a valid command");
-                        break;
-                }
-
+            {
+                ArgList.Execute(args);
                 break;
+            }
 
             case "add":
+            {
                 Repo? repo;
                 switch (args.Length)
                 {
@@ -125,24 +72,47 @@ public static class Program
                 Console.WriteLine("Added repo");
 
                 await UpdateManager.SearchForUpdates(repo, Console.WriteLine);
-                
+
                 UpdateManager.Repos.Add(repo);
                 FileManager.SaveRepos();
                 break;
-            
+            }
+
             case "check":
-                await UpdateManager.SearchForUpdates(UpdateManager.Repos, Console.WriteLine);
+            {
+                int repoId = -1;
+                if (args.Length > 1)
+                {
+                    repoId = int.Parse(args[1]);
+                    
+                    if (repoId < 0 || repoId >= UpdateManager.Repos.Count)
+                    {
+                        Console.WriteLine($"repo id {repoId} out of range");
+                        return;
+                    }
+                }
+
+                if (repoId < 0)
+                {
+                    await UpdateManager.SearchForUpdates(UpdateManager.Repos, Console.WriteLine);
+                }
+                else
+                {
+                    await UpdateManager.SearchForUpdates(UpdateManager.Repos[repoId], Console.WriteLine);
+                }
+                FileManager.SaveRepos();
+                
                 int count = 0;
                 UpdateManager.Repos.ForEach(repo =>
                 {
                     if (repo.Tag != repo.CurrentInstallTag)
                     {
-                        count++; 
+                        count++;
                     }
                 });
-                FileManager.SaveRepos();
-                Console.WriteLine($"{count} updates available execute {CliName} list to view details");
+                Console.WriteLine($"{count} updates available execute {AppInfo.CliName} list to view details");
                 break;
+            }
 
             case "update":
             {
@@ -172,43 +142,7 @@ public static class Program
 
             case "repo":
             {
-                if (args.Length <= 1)
-                {
-                    Console.WriteLine("\nSpecify repository id:\n\n" +
-                                      $"{CliName} repo (repo id)\n");
-                    return;
-                }
-
-                if (args.Length <= 2)
-                {
-                    Console.WriteLine("test1");
-                    return;
-                }
-
-                int repoId = int.Parse(args[1]);
-
-                switch (args[2])
-                {
-                    case "set-asset":
-                        if (args.Length <= 3)
-                        {
-                            Console.WriteLine("\nSpecify asset id:\n\n" +
-                                              $"{CliName} repo set-asset (asset id)\n");
-                            return;
-                        }
-
-                        int assetId = int.Parse(args[3]);
-                        if (assetId < 0 || assetId > UpdateManager.Repos[repoId].AssetNames.Count)
-                        {
-                            Console.WriteLine($"asset id {assetId} out of range");
-                            return;
-                        }
-
-                        UpdateManager.Repos[repoId].DownloadAssetIndex = assetId;
-                        FileManager.SaveRepos();
-                        break;
-                }
-
+                ArgRepo.Execute(args);
                 break;
             }
 
@@ -243,7 +177,7 @@ public static class Program
                     case "set":
                         if (args.Length <= 2)
                         {
-                            Console.WriteLine($"Specify personal access token: {CliName} pat set (personal access token)");
+                            Console.WriteLine($"Specify personal access token: {AppInfo.CliName} pat set (personal access token)");
                             return;
                         }
                         
@@ -267,18 +201,20 @@ public static class Program
         Console.WriteLine($"""
 
                            Command:
-                            {CliName} [list of arguments]
+                            {AppInfo.CliName} [list of arguments]
                             
                            Arguments:
                             -h / --help - Show this menu
                             
                             list repos - List all tracked repositories
                             list assets (repo id) - List all available assets of a specific repo
+                            list versions (repo id) - List all available versions of a specific repo
                             repo (repo id) set-asset (asset id) - Select specific asset to download from repository by id
                             add (repo link) - Add a repository with github-link of repository
                             add add (publisher name) (repo name) - Add a repository with publisher-name and repository-name
                             remove (repo id) - Remove repository by id
                             check - Check for available updates
+                            check (repo id) - Check for available updates of specific repository
                             update --all - Update all repositories if updates available
                             update (repo id) - Update specific repository by id
                             pat set (pat) - Set a personal access token to access private repositories and increase rate-limit

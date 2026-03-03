@@ -1,6 +1,6 @@
-Package: github-downloader
+Package: github-downloader-cli
 Version: 2.1.1
 Section: utils
 Architecture: arm64
 Maintainer: Tobias2888 <github.flashy834@passmail.net>
-Description: GitHub Downloader
+Description: GitHub Downloader cli
