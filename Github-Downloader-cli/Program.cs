@@ -205,6 +205,7 @@ public static class Program
                             
                            Arguments:
                             -h / --help - Show this menu
+                            -v / --version - Show installed version
                             
                             list repos - List all tracked repositories
                             list assets (repo id) - List all available assets of a specific repo
