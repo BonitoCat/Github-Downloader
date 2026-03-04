@@ -11,6 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\LoggerLib\LoggerLib\LoggerLib.csproj" />
       <ProjectReference Include="..\Github-Downloader-lib\Github-Downloader-lib.csproj" />
     </ItemGroup>
 

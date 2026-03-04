@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using FileLib;
 using Github_Downloader_lib.Models;
@@ -13,6 +15,8 @@ public static class FileManager
     private static readonly string PatFilePath = Path.Join(AppdataPath, "pat");
     public static readonly string CachePath = Path.Join(DirectoryHelper.GetCacheDirPath(), "github-downloader");
     public static readonly string AppImagesPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader", "app-images");
+    private static readonly byte[] Key = Encoding.UTF8.GetBytes("12345678901234567890123456789012");
+    private static readonly byte[] IV = Encoding.UTF8.GetBytes("1234567890123456");
     
     public static void SaveRepos()
     {
@@ -52,18 +56,49 @@ public static class FileManager
         await UpdateManager.SearchForUpdates(UpdateManager.Repos, statusText);
         SaveRepos();
     }
-
+    
     public static void SetPat(string pat)
     {
         if (string.IsNullOrEmpty(pat))
         {
             return;
         }
-        File.WriteAllText(PatFilePath, pat);
+        
+        using Aes aes = Aes.Create();
+        aes.Key = Key;
+        aes.IV = IV;
+
+        ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+        using MemoryStream ms = new();
+        using CryptoStream cs = new(ms, encryptor, CryptoStreamMode.Write);
+        using StreamWriter sw = new(cs);
+
+        sw.Write(pat);
+        sw.Close();
+
+        File.WriteAllBytes(PatFilePath, ms.ToArray());
     }
-    
+
     public static string GetPat()
     {
-        return !File.Exists(PatFilePath) ? "" : File.ReadAllText(PatFilePath);
+        if (!File.Exists(PatFilePath))
+        {
+            return "";
+        }
+
+        byte[] encrypted = File.ReadAllBytes(PatFilePath);
+
+        using Aes aes = Aes.Create();
+        aes.Key = Key;
+        aes.IV = IV;
+
+        ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+        using MemoryStream ms = new(encrypted);
+        using CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Read);
+        using StreamReader sr = new(cs);
+
+        return sr.ReadToEnd();
     }
 }
