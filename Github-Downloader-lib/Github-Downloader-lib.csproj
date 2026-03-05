@@ -17,9 +17,4 @@
       </Reference>
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\FileLib\FileLib\FileLib.csproj" />
-      <ProjectReference Include="..\..\LoggerLib\LoggerLib\LoggerLib.csproj" />
-    </ItemGroup>
-
 </Project>
