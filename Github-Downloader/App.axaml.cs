@@ -13,8 +13,8 @@ using FileLib;
 using Github_Downloader_lib;
 using Github_Downloader.Enums;
 using Github_Downloader.ViewModels;
-using LoggerLib;
 using SecretsLib;
+using LoggerLib;
 
 namespace Github_Downloader;
 
