@@ -20,4 +20,9 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\MetadataGenerator\MetadataGenerator\MetadataGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <AdditionalFiles Include="../builds/github-downloader-linux-x64/DEBIAN/control" />
+    </ItemGroup>
+
 </Project>

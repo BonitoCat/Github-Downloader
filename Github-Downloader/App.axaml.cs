@@ -14,6 +14,8 @@ using LoggerLib;
 using Github_Downloader_lib;
 using Github_Downloader.Enums;
 using Github_Downloader.ViewModels;
+using LoggerLib;
+using SecretsLib;
 
 namespace Github_Downloader;
 
@@ -42,6 +44,12 @@ public partial class App : Application
                 Environment.Exit(0);
             #endif
         }
+
+        if (!SecretsManager.Initialized)
+        {
+            SecretsManager.Initialize("hofinga.gh-downloader.secret");
+        }
+        
         AvaloniaXamlLoader.Load(this);
     }
 

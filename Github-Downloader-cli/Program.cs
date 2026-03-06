@@ -4,6 +4,7 @@ using Github_Downloader_lib;
 using Github_Downloader_lib.Models;
 using Github_Downloader.Enums;
 using LoggerLib;
+using SecretsLib;
 
 namespace Github_Downloader_cli;
 
@@ -13,7 +14,12 @@ public static class Program
     {
         Logger.LogDir = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader", "logs");
         Logger.CreateFile();
-
+        
+        if (!SecretsManager.Initialized)
+        {
+            SecretsManager.Initialize("hofinga.gh-downloader.secret");
+        }
+        
         UpdateManager.CurPlatform = Platform.Terminal;
         
         await FileManager.LoadRepos(Console.WriteLine);
@@ -141,7 +147,37 @@ public static class Program
 
                 break;
             }
+            
+            case "reinstall":
+            {
+                if (args.Length <= 1)
+                {
+                    return;
+                }
 
+                if (args[1] == "--all")
+                {
+                    await UpdateManager.SearchForUpdates(UpdateManager.Repos, Console.WriteLine);
+                    await UpdateManager.UpdateRepos(UpdateManager.Repos,
+                        Console.WriteLine,
+                        Console.WriteLine, 
+                        true);
+                    FileManager.SaveRepos();
+                    return;
+                }
+
+                int repoId = int.Parse(args[1]);
+
+                await UpdateManager.SearchForUpdates(UpdateManager.Repos[repoId], Console.WriteLine);
+                await UpdateManager.UpdateRepo(UpdateManager.Repos[repoId],
+                    Console.WriteLine,
+                    Console.WriteLine,
+                    true);
+                FileManager.SaveRepos();
+
+                break;
+            }
+                
             case "repo":
             {
                 ArgRepo.Execute(args);
@@ -183,11 +219,11 @@ public static class Program
                             return;
                         }
                         
-                        FileManager.SetPat(args[3]);
+                        SecretsManager.StoreSecret("pat", args[3]);
                         break;
                     
                     case "remove":
-                        FileManager.SetPat("");
+                        SecretsManager.ClearSecret("pat");
                         break;
                 }
                 break;
