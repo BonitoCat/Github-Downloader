@@ -23,10 +23,13 @@
 
     <ItemGroup>
       <Reference Include="FileLib">
-        <HintPath>..\..\Libs\FileLib.dll</HintPath>
+        <HintPath>..\libs\FileLib.dll</HintPath>
       </Reference>
       <Reference Include="LoggerLib">
-        <HintPath>..\..\Libs\LoggerLib.dll</HintPath>
+        <HintPath>..\libs\LoggerLib.dll</HintPath>
+      </Reference>
+      <Reference Include="SecretsLib">
+        <HintPath>..\libs\SecretsLib.dll</HintPath>
       </Reference>
     </ItemGroup>
 
