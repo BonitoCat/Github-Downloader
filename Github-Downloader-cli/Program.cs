@@ -248,6 +248,7 @@ public static class Program
                             list repos - List all tracked repositories
                             list assets (repo id) - List all available assets of a specific repo
                             list versions (repo id) - List all available versions of a specific repo
+                            repo (repo id) - Show repository-details about specific repository
                             repo (repo id) set-asset (asset id) - Select specific asset to download from repository by id
                             repo (repo id) set-version (version) - Select specific version to download from repository
                             repo (repo id) set-downloadpath (path) - Select specific download path
