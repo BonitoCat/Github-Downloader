@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -11,7 +10,7 @@ using Avalonia.Platform.Storage;
 using Github_Downloader_lib;
 using Github_Downloader.Enums;
 using Github_Downloader.ViewModels;
-using SecretsLib;
+using LoggerLib;
 
 namespace Github_Downloader.Views;
 
@@ -113,8 +112,10 @@ public partial class RepoDetailsView : UserControl
         {
             StpSaveFileAnyway.IsVisible = false;
         }
-        
+
+        TglRenameFile.IsChecked = _repoDetailsViewModel.Repo.NewFileName != ""; 
         TbxRenameFile.IsVisible = TglRenameFile.IsChecked == true;
+        TbxRenameFile.Text = _repoDetailsViewModel.Repo.NewFileName;
     }
 
     private void BtnBack_OnClick(object? sender, RoutedEventArgs e)
@@ -201,11 +202,20 @@ public partial class RepoDetailsView : UserControl
 
     private void TglRenameFile_OnClick(object? sender, RoutedEventArgs e)
     {
-        TbxRenameFile.IsVisible = TglRenameFile.IsChecked == true;
+        bool rename = TglRenameFile.IsChecked == true;
+        TbxRenameFile.IsVisible = rename;
+        if (!rename)
+        {
+            _repoDetailsViewModel.Repo.NewFileName = "";
+            FileManager.SaveRepos();
+        }
     }
 
     private void TbxRenameFile_OnTextChanged(object? sender, TextChangedEventArgs e)
     {
-        //Console.WriteLine(TbxRenameFile.Text);
+        Logger.LogI("Changed 'new file name'");
+
+        _repoDetailsViewModel.Repo.NewFileName = TbxRenameFile.Text;
+        FileManager.SaveRepos();
     }
 }

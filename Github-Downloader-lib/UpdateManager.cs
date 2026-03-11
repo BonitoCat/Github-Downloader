@@ -344,7 +344,8 @@ public static class UpdateManager
 
     private static void CopyFile(Asset asset)
     {
-        string destPath = Path.Join(asset.Repo.DownloadPath, asset.Repo.AssetNames[asset.Repo.DownloadAssetIndex]);
+        string destName = asset.Repo.NewFileName == "" ? asset.Repo.AssetNames[asset.Repo.DownloadAssetIndex] : asset.Repo.NewFileName;
+        string destPath = Path.Join(asset.Repo.DownloadPath, destName);
         if (File.Exists(destPath))
         {
             File.Delete(destPath);
