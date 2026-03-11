@@ -161,6 +161,19 @@ public class Repo : INotifyPropertyChanged
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SaveFileAnyway)));
         }
     }
+    
+    private string _newFileName = string.Empty;
+
+    public string NewFileName
+    {
+        get => _newFileName;
+        set
+        {
+            if (_newFileName == value) return;
+            _newFileName = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NewFileName)));
+        }
+    }
 
     public bool ExcludedFromDownloadAll { get; set; } = false;
 

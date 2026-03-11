@@ -41,10 +41,14 @@ public static class UpdateManager
         string url = $"https://api.github.com/repos/{publisherName}/{repoName}/releases/latest";
         string repoUrl = $"https://api.github.com/repos/{publisherName}/{repoName}";
         
+        Logger.LogI($"Adding repo: {repoUrl}");
+        
         HttpResponseMessage httpRepoResponse = await Api.GetRequest(repoUrl, SecretsManager.LookupSecret("pat"));
         if (httpRepoResponse == null || !httpRepoResponse.IsSuccessStatusCode)
         {
             Logger.LogE($"Failed to fetch repo: {repoUrl}");
+            Logger.LogE(httpRepoResponse.StatusCode.ToString());
+            Logger.LogE(httpRepoResponse.ReasonPhrase);
             return null;
         }
         
@@ -62,17 +66,19 @@ public static class UpdateManager
 
     public static async Task UpdateRepoDetails(List<Repo> repos)
     {
+        Logger.LogI("Updating repo-details");
+        
         foreach (Repo repo in repos)
         {
             HttpResponseMessage httpRepoResponse = await Api.GetRequest(repo.Url.Replace("/releases/latest", ""), SecretsManager.LookupSecret("pat"));
             if (httpRepoResponse == null || !httpRepoResponse.IsSuccessStatusCode)
             {
                 Console.WriteLine("Failed to fetch repo");
-                Logger.LogW("Failed to fetch repo");
+                Logger.LogE("Failed to fetch repo");
                 if (httpRepoResponse != null)
                 {
-                    Logger.LogW(httpRepoResponse.StatusCode.ToString());
-                    Logger.LogW(httpRepoResponse.ReasonPhrase);
+                    Logger.LogE(httpRepoResponse.StatusCode.ToString());
+                    Logger.LogE(httpRepoResponse.ReasonPhrase);
                 }
                 return;
             }
@@ -91,21 +97,19 @@ public static class UpdateManager
 
     public static async Task SearchForUpdates(List<Repo> repos, Action<string> statusText)
     {
+        Logger.LogI("Searching for updates");
+        
         foreach (Repo repo in repos)
         {
             statusText.Invoke($"Checking for {repo.Name}");
             await SearchForUpdates(repo, statusText, true);
         }
-
-        foreach (Repo repo in repos)
-        {
-            if (repo.Tag == repo.CurrentInstallTag) continue;
-            return;
-        }
     }
 
     public static async Task SearchForUpdates(Repo repo, Action<string> statusText, bool multiDownload = false)
     {
+        Logger.LogI($"Checking for {repo.Name}");
+        
         if (!multiDownload)
         {
             statusText.Invoke($"Checking for {repo.Name}");
@@ -125,7 +129,9 @@ public static class UpdateManager
         if (!httpResponse.IsSuccessStatusCode)
         {
             Console.WriteLine($"Failed to fetch release of: {responseUrl}");
-            Logger.LogW($"Failed to fetch release of: {responseUrl}");
+            Logger.LogE($"Failed to fetch release of: {responseUrl}");
+            Logger.LogE(httpResponse.StatusCode.ToString());
+            Logger.LogE(httpResponse.ReasonPhrase);
             return;
         }
         
@@ -149,7 +155,9 @@ public static class UpdateManager
         if (!httpResponseTags.IsSuccessStatusCode)
         {
             Console.WriteLine($"Failed to fetch tags of: {tagsUrl}");
-            Logger.LogW($"Failed to fetch tags of: {tagsUrl}");
+            Logger.LogE($"Failed to fetch tags of: {tagsUrl}");
+            Logger.LogE(httpResponseTags.StatusCode.ToString());
+            Logger.LogE(httpResponseTags.ReasonPhrase);
             return;
         }
         
@@ -188,6 +196,8 @@ public static class UpdateManager
 
     private static void UpdateRepos(List<Asset?> assets, Action<string> statusText, Action<string> progressText)
     {
+        Logger.LogI("Updating repos");
+        
         List<string> debs = [];
         List<string> exes = [];
         List<Asset> appImages = [];
@@ -230,6 +240,8 @@ public static class UpdateManager
     {
         foreach (Asset asset in assets)
         {
+            Logger.LogI($"Installing AppImage: {asset.Repo.Name}");
+            
             string assetPath = Path.Join(FileManager.AppImagesPath, asset.Repo.Name.Replace('/', '-'));
             DirectoryHelper.CreateDir(assetPath);
             string destPath = Path.Join(assetPath, asset.Repo.Name.Replace('/', '-') + ".AppImage");
@@ -302,7 +314,8 @@ public static class UpdateManager
         
     private static async Task<Asset?> DownloadAsset(Repo repo, Action<string> statusText, Action<string> progressText, bool downloadAnyways = false)
     {
-        Logger.LogI($"Downloading asset {repo.Name}, {repo.Tag}");
+        Logger.LogI($"Downloading asset: {repo.Name}, {repo.Tag}");
+        
         if (!downloadAnyways && repo.Tag == repo.CurrentInstallTag)
         {
             return null;
@@ -331,7 +344,8 @@ public static class UpdateManager
 
     private static void CopyFile(Asset asset)
     {
-        string destPath = Path.Join(asset.Repo.DownloadPath, asset.Repo.AssetNames[asset.Repo.DownloadAssetIndex]);
+        string destName = asset.Repo.NewFileName == "" ? asset.Repo.AssetNames[asset.Repo.DownloadAssetIndex] : asset.Repo.NewFileName;
+        string destPath = Path.Join(asset.Repo.DownloadPath, destName);
         if (File.Exists(destPath))
         {
             File.Delete(destPath);
@@ -342,6 +356,8 @@ public static class UpdateManager
 
     private static void InstallDebs(List<string> debPaths, Action<string> progressText)
     {
+        Logger.LogI($"Installing debs: {debPaths}");
+        
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             return;
@@ -362,6 +378,9 @@ public static class UpdateManager
         {
             return;
         }
+
+        Logger.LogI($"Install command: {installCommand}");
+        Logger.LogI("Using " + (CurPlatform == Platform.Avalonia ? "pkexec" : "sudo") + " for root");
         
         Process process = new()
         {
@@ -377,7 +396,6 @@ public static class UpdateManager
             EnableRaisingEvents = true
         };
         
-        Logger.LogI(installCommand);
         process.OutputDataReceived += (_, args) =>
         {
             Logger.LogI(args.Data);
@@ -390,13 +408,22 @@ public static class UpdateManager
         process.BeginErrorReadLine();
 
         process.WaitForExit();
+        
+        if (process.ExitCode == 0)
+        {
+            Logger.LogI("Installation complete");
+        }
+        else
+        {
+            Logger.LogE($"Installation failed with exit code {process.ExitCode}");
+        }
     }
 
     private static void InstallExe(List<string> exePaths, Action<string> progressText)
     {
         foreach (string exePath in exePaths)
         {
-            Logger.LogI($"Installing {exePath}");
+            Logger.LogI($"Installing exe: {exePath}");
             
             Process process = new()
             {
