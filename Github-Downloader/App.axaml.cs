@@ -43,11 +43,6 @@ public partial class App : Application
                 Environment.Exit(0);
             #endif
         }
-
-        if (!SecretsManager.Initialized)
-        {
-            SecretsManager.Initialize("hofinga.gh-downloader.secret");
-        }
         
         AvaloniaXamlLoader.Load(this);
     }
@@ -67,6 +62,11 @@ public partial class App : Application
 
     private async Task Start()
     {
+        if (!SecretsManager.Initialized)
+        {
+            SecretsManager.Initialize("hofinga.gh-downloader.secret");
+        }
+        
         _appdataPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader");
         _reposConfigFilePath = Path.Join(_appdataPath, "repos.json");
         Logger.LogDir = Path.Join(_appdataPath, "logs");

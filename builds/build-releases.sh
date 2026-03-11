@@ -40,7 +40,6 @@ dotnet publish ../Github-Downloader-cli/Github-Downloader-cli.csproj \
     --self-contained true \
     --output ./github-downloader-cli-linux-x64/usr/local/bin \
     /p:PublishSingleFile=true \
-    /p:PublishReadyToRun=true \
     /p:DebugType=None \
     /p:DebugSymbols=false
 
@@ -52,7 +51,6 @@ dotnet publish ../Github-Downloader-cli/Github-Downloader-cli.csproj \
     --self-contained true \
     --output ./github-downloader-cli-linux-arm64/usr/local/bin \
     /p:PublishSingleFile=true \
-    /p:PublishReadyToRun=true \
     /p:DebugType=None \
     /p:DebugSymbols=false
 
@@ -64,7 +62,6 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     --self-contained true \
     --output ./github-downloader-linux-x64/opt/Github-Downloader \
     /p:PublishSingleFile=true \
-    /p:PublishReadyToRun=true
 
 dotnet restore ../Github-Downloader/Github-Downloader.csproj -r linux-x64
 dotnet publish ../Github-Downloader/Github-Downloader.csproj \
@@ -74,7 +71,6 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     --self-contained true \
     --output ./github-downloader-linux-x64-appimage/usr/bin \
     /p:PublishSingleFile=true \
-    /p:PublishReadyToRun=true
 
 dotnet restore ../Github-Downloader/Github-Downloader.csproj -r linux-arm64
 dotnet publish ../Github-Downloader/Github-Downloader.csproj \
@@ -84,7 +80,6 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     --self-contained true \
     --output ./github-downloader-linux-arm64/opt/Github-Downloader \
     /p:PublishSingleFile=true \
-    /p:PublishReadyToRun=true
 
 dotnet restore ../Github-Downloader/Github-Downloader.csproj -r osx-x64
 dotnet publish ../Github-Downloader/Github-Downloader.csproj \
@@ -94,7 +89,6 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     --self-contained true \
     --output ./github-downloader-osx-x64 \
     /p:PublishSingleFile=true \
-    /p:PublishReadyToRun=true
 
 dotnet restore ../Github-Downloader/Github-Downloader.csproj -r osx-arm64
 dotnet publish ../Github-Downloader/Github-Downloader.csproj \
@@ -104,7 +98,6 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     --self-contained true \
     --output ./github-downloader-osx-arm64 \
     /p:PublishSingleFile=true \
-    /p:PublishReadyToRun=true
 
 dotnet restore ../Github-Downloader/Github-Downloader.csproj -r win-x64
 dotnet publish ../Github-Downloader/Github-Downloader.csproj \
@@ -114,7 +107,6 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     --self-contained true \
     --output ./github-downloader-win-x64 \
     /p:PublishSingleFile=true \
-    /p:PublishReadyToRun=true
 
 dotnet restore ../Github-Downloader/Github-Downloader.csproj -r win-arm64
 dotnet publish ../Github-Downloader/Github-Downloader.csproj \
@@ -124,7 +116,6 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     --self-contained true \
     --output ./github-downloader-win-arm64 \
     /p:PublishSingleFile=true \
-    /p:PublishReadyToRun=true
 
 
 rm -rf release-assets/*
