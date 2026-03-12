@@ -1,9 +1,12 @@
-read -p "Enter new version number: " NEW_VERSION
-
 CONTROL_FILE_X64="./github-downloader-linux-x64/DEBIAN/control"
 CONTROL_FILE_ARM64="./github-downloader-linux-arm64/DEBIAN/control"
 CONTROL_FILE_X64_CLI="./github-downloader-cli-linux-x64/DEBIAN/control"
 CONTROL_FILE_ARM64_CLI="./github-downloader-cli-linux-arm64/DEBIAN/control"
+
+VERSION=$(sed -n 's/^Version: //p' "$CONTROL_FILE_X64")
+echo "Current version: $VERSION"
+
+read -p "Enter new version number: " NEW_VERSION
 
 if [ ! -f "$CONTROL_FILE_X64" ]; then
     echo "Control file not found at $CONTROL_FILE_X64"
