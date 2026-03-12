@@ -4,6 +4,8 @@ CONTROL_FILE_X64="./github-downloader-linux-x64/DEBIAN/control"
 CONTROL_FILE_ARM64="./github-downloader-linux-arm64/DEBIAN/control"
 CONTROL_FILE_X64_CLI="./github-downloader-cli-linux-x64/DEBIAN/control"
 CONTROL_FILE_ARM64_CLI="./github-downloader-cli-linux-arm64/DEBIAN/control"
+NSI_FILE_X64="./win-x64.nsi"
+NSI_FILE_ARM64="./win-arm64.nsi"
 
 if [ ! -f "$CONTROL_FILE_X64" ]; then
     echo "Control file not found at $CONTROL_FILE_X64"
@@ -21,6 +23,14 @@ if [ ! -f "$CONTROL_FILE_ARM64_CLI" ]; then
     echo "Control file not found at $CONTROL_FILE_ARM64_CLI"
     exit 1
 fi
+if [ ! -f "$NSI_FILE_X64" ]; then
+    echo "Control file not found at $NSI_FILE_X64"
+    exit 1
+fi
+if [ ! -f "$NSI_FILE_ARM64" ]; then
+    echo "Control file not found at $NSI_FILE_ARM64"
+    exit 1
+fi
 
 if [ -z "$NEW_VERSION" ]; then
     echo "No version entered. Exiting."
@@ -31,6 +41,8 @@ sed -i "s/^Version: .*/Version: $NEW_VERSION/" "$CONTROL_FILE_X64"
 sed -i "s/^Version: .*/Version: $NEW_VERSION/" "$CONTROL_FILE_ARM64"
 sed -i "s/^Version: .*/Version: $NEW_VERSION/" "$CONTROL_FILE_X64_CLI"
 sed -i "s/^Version: .*/Version: $NEW_VERSION/" "$CONTROL_FILE_ARM64_CLI"
+sed -i "s/^\(!define VERSION\s\+\)\"[^\"]\+\"/\1\"$NEW_VERSION\"/" "$NSI_FILE_X64"
+sed -i "s/^\(!define VERSION\s\+\)\"[^\"]\+\"/\1\"$NEW_VERSION\"/" "$NSI_FILE_ARM64"
 
 dotnet restore ../Github-Downloader-cli/Github-Downloader-cli.csproj -r linux-x64
 dotnet publish ../Github-Downloader-cli/Github-Downloader-cli.csproj \
@@ -105,7 +117,7 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     -c Release \
     -r win-x64 \
     --self-contained true \
-    --output ./github-downloader-win-x64 \
+    --output ./win-x64 \
     /p:PublishSingleFile=true \
 
 dotnet restore ../Github-Downloader/Github-Downloader.csproj -r win-arm64
@@ -114,7 +126,7 @@ dotnet publish ../Github-Downloader/Github-Downloader.csproj \
     -c Release \
     -r win-arm64 \
     --self-contained true \
-    --output ./github-downloader-win-arm64 \
+    --output ./win-arm64 \
     /p:PublishSingleFile=true \
 
 
@@ -128,9 +140,10 @@ dpkg-deb --build github-downloader-cli-linux-arm64 ./release-assets
 ARCH=x86_64 ./AppImage-appimagetool.AppImage ./github-downloader-linux-x64-appimage
 mv ./Github_Downloader-x86_64.AppImage release-assets/Github_Downloader-x86_64.AppImage
 
-zip -r release-assets/github-downloader-win-x64.zip github-downloader-win-x64
+makensis win-x64.nsi
+makensis win-arm64.nsi
+
 zip -r release-assets/github-downloader-osx-x64.zip github-downloader-osx-x64
-zip -r release-assets/github-downloader-win-arm64.zip github-downloader-win-arm64
 zip -r release-assets/github-downloader-osx-arm64.zip github-downloader-osx-arm64
 
 printf "\nBuild Finished. Press Enter to exit"

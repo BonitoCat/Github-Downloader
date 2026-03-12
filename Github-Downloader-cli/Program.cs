@@ -219,7 +219,7 @@ public static class Program
                             return;
                         }
                         
-                        SecretsManager.StoreSecret("pat", args[3]);
+                        SecretsManager.StoreSecret("pat", args[2]);
                         break;
                     
                     case "remove":
