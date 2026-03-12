@@ -53,12 +53,12 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
-builds/github-downloader-win-x64/*
-!builds/github-downloader-win-x64/.gitkeep
+builds/win-x64/*
+!builds/win-x64/.gitkeep
+builds/win-arm64/*
+!builds/win-arm64/.gitkeep
 builds/github-downloader-osx-x64/*
 !builds/github-downloader-osx-x64/.gitkeep
-builds/github-downloader-win-arm64/*
-!builds/github-downloader-win-arm64/.gitkeep
 builds/github-downloader-osx-arm64/*
 !builds/github-downloader-osx-arm64/.gitkeep
 builds/github-downloader-linux-x64/opt/Github-Downloader/*
