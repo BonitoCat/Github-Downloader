@@ -18,5 +18,9 @@
                  <DataTemplate DataType="{x:Type vm:RepoDetailsViewModel}">
                      <views:RepoDetailsView/>
                  </DataTemplate>
+                 
+                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+                     <views:SettingsView/>
+                 </DataTemplate>
              </Application.DataTemplates>
 </Application>

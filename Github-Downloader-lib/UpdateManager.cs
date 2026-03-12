@@ -219,7 +219,8 @@ public static class UpdateManager
                 appImages.Add(asset.Value);
                 if (!asset.Value.Repo.SaveFileAnyway) continue;
             }
-            else if (asset.Value.TempAssetPath.EndsWith(".exe"))
+            else if (asset.Value.TempAssetPath.EndsWith(".exe") ||
+                     asset.Value.TempAssetPath.EndsWith(".exe"))
             {
                 exes.Add(asset.Value.TempAssetPath);
                 if (!asset.Value.Repo.SaveFileAnyway) continue;

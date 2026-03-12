@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Github_Downloader.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Github_Downloader.Views.SettingsView"
+             x:DataType="viewModels:SettingsViewModel">
+    
+    <Grid>
+        <StackPanel>
+            <Image Name="ImgBack" Source="../resources/arrow_back.png" Height="35" Width="35" PointerPressed="ImgBack_OnPointerPressed"/>
+            <Button Name="BtnImport" Content="Import" Click="BtnImport_OnClick"/>
+            <Button Name="BtnExport" Content="Export" Click="BtnExport_OnClick"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

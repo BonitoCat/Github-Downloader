@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -35,6 +36,7 @@ public static class FileManager
 
     public static async Task LoadRepos(Action<string> statusText)
     {
+        DirectoryHelper.CreateDir(AppdataPath);
         DirectoryHelper.CreateDir(CachePath);
         DirectoryHelper.CreateDir(AppImagesPath);
         
@@ -52,7 +54,34 @@ public static class FileManager
         }
         
         await UpdateManager.UpdateRepoDetails(UpdateManager.Repos);
-        await UpdateManager.SearchForUpdates(UpdateManager.Repos, statusText);
         SaveRepos();
+    }
+
+    public static void ExportRepoConfig(string destPath)
+    {
+        if (!File.Exists(ReposConfigFilePath))
+        {
+            Logger.LogI($"Folder {destPath} not found");
+            return;
+        }
+        
+        File.Copy(ReposConfigFilePath, Path.Join(destPath, "repos.json"), true);
+    }
+
+    public static void ImportRepoConfig(string sourceFile)
+    {
+        if (!File.Exists(sourceFile))
+        {
+            Logger.LogI($"File {sourceFile} not found");
+            return;
+        }
+        
+        File.Copy(sourceFile, Path.Join(AppdataPath, "repos.json"), true);
+        LoadRepos(Console.WriteLine);
+
+        foreach (Repo repo in UpdateManager.Repos)
+        {
+            repo.CurrentInstallTag = "";
+        }
     }
 }

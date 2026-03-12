@@ -94,6 +94,8 @@ public partial class HomeView : UserControl
             ToastPopup.IsOpen = true;
             await Task.Delay(2500);
             ToastPopup.IsOpen = false;
+
+            return;
         }
         
         _downloadStatusViewModel.IsUpdating = true;
@@ -220,7 +222,7 @@ public partial class HomeView : UserControl
 
         ComboBox cobAssets = new()
         {
-            Width = 200,
+            Width = 300,
             ItemsSource =  repo.AssetNames,
             SelectedIndex = repo.DownloadAssetIndex,
             Margin = new(10, 0)
@@ -339,5 +341,10 @@ public partial class HomeView : UserControl
     {
         SecretsManager.ClearSecret("pat");
         //File.WriteAllText(_mainViewModel.PatFilePath, "");
+    }
+
+    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        _mainViewModel.SwitchPage(ViewNames.Settings);
     }
 }

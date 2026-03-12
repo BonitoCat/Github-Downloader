@@ -22,6 +22,7 @@ public class MainViewModel : ViewModelBase
         CurrentPage = viewName switch
         {
             ViewNames.RepoDetails => new RepoDetailsViewModel(),
+            ViewNames.Settings => new SettingsViewModel(),
             _ => new HomeViewModel()
         };
     }
@@ -39,21 +40,9 @@ public class MainViewModel : ViewModelBase
             OnPropertyChanged();
         }
     }
-    
-    public readonly string AppdataPath;
-    public readonly string CachePath;
-    public readonly string PatFilePath;
-    public readonly string AppImagesPath;
 
     public MainViewModel()
     {
-        AppdataPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader");
-        CachePath = Path.Join(DirectoryHelper.GetCacheDirPath(), "github-downloader");
-        PatFilePath = Path.Join(AppdataPath, "pat");
-        AppImagesPath = Path.Join(AppdataPath, "app-images");
         
-        DirectoryHelper.CreateDir(AppdataPath);
-        DirectoryHelper.CreateDir(CachePath);
-        DirectoryHelper.CreateDir(AppImagesPath);
     }
 }
