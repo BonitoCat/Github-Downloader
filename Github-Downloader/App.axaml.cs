@@ -11,6 +11,7 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using FileLib;
 using Github_Downloader_lib;
+using Github_Downloader_lib.Models;
 using Github_Downloader.Enums;
 using Github_Downloader.ViewModels;
 using SecretsLib;
@@ -88,6 +89,16 @@ public partial class App : Application
                 DownloadStatusViewModel.StatusText = statusText;
             });
             DownloadStatusViewModel.IsUpdating = false;
+            
+            bool hasUpdates = false;
+            foreach (Repo repo in UpdateManager.Repos)
+            {
+                if (repo.CurrentInstallTag != repo.Tag)
+                {
+                    hasUpdates = true;
+                }
+            }
+            MainViewModel.HasUpdates = hasUpdates;
             FileManager.SaveRepos();
         };
         timer.Interval = TimeSpan.FromMinutes(UpdateInterval);
@@ -105,9 +116,7 @@ public partial class App : Application
 
         MainViewModel.PropertyChanged += (_, args) =>
         {
-            Console.WriteLine("aölskdjölkj: " + args.PropertyName);
             if (args.PropertyName != nameof(MainViewModel.HasUpdates)) return;
-            Console.WriteLine("fffffff");
             
             _trayIcon.Icon = !MainViewModel.HasUpdates ? 
                 new(new Bitmap(AssetLoader.Open(new(Path.Join(ResPath, "icon.png"))))) 

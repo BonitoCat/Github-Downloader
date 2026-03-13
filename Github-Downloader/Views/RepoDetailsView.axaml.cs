@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Github_Downloader_lib;
+using Github_Downloader_lib.Models;
 using Github_Downloader.Enums;
 using Github_Downloader.ViewModels;
 using LoggerLib;
@@ -71,6 +72,16 @@ public partial class RepoDetailsView : UserControl
                 _downloadStatusViewModel.StatusText = statusText;
             });
             _downloadStatusViewModel.IsUpdating = false;
+            
+            bool hasUpdates = false;
+            foreach (Repo repo in UpdateManager.Repos)
+            {
+                if (repo.CurrentInstallTag != repo.Tag)
+                {
+                    hasUpdates = true;
+                }
+            }
+            _mainViewModel.HasUpdates = hasUpdates;
             FileManager.SaveRepos();
         };
         
