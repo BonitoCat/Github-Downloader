@@ -13,6 +13,7 @@ public static class Program
     private static async Task Main(string[] args)
     {
         Logger.LogDir = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader", "logs");
+        Logger.LogToTerminal = false;
         Logger.CreateFile();
         
         if (!SecretsManager.Initialized)
