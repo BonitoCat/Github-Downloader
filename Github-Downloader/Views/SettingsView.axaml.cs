@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using FileLib;
 using Github_Downloader_lib;
 using Github_Downloader.Enums;
 using Github_Downloader.ViewModels;
@@ -22,6 +20,17 @@ public partial class SettingsView : UserControl
     {
         InitializeComponent();
         _mainViewModel = ((App)Application.Current!).MainViewModel;
+    }
+
+    private void Control_OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        CobWindowState.SelectedIndex = _mainViewModel.AppSettings.WindowState switch
+        {
+            WindowState.Normal => 0,
+            WindowState.Maximized => 1,
+            WindowState.FullScreen => 2,
+            _ => 0
+        };
     }
 
     private async void BtnExport_OnClick(object? sender, RoutedEventArgs e)
@@ -75,5 +84,18 @@ public partial class SettingsView : UserControl
     private void ImgBack_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         _mainViewModel.SwitchPage(ViewNames.Home);
+    }
+
+    private void CobWindowState_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        _mainViewModel.AppSettings.WindowState = CobWindowState.SelectedIndex switch
+        {
+            0 => WindowState.Normal,
+            1 => WindowState.Maximized,
+            2 => WindowState.FullScreen,
+            _ => _mainViewModel.AppSettings.WindowState
+        };
+        _mainViewModel.AppSettings.Save();
+        Logger.LogI("Change default window state");
     }
 }

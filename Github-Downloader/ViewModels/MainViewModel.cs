@@ -1,4 +1,6 @@
 using Github_Downloader.Enums;
+using Github_Downloader.Models;
+using LoggerLib;
 
 namespace Github_Downloader.ViewModels;
 
@@ -17,6 +19,7 @@ public class MainViewModel : ViewModelBase
 
     public void SwitchPage(ViewNames viewName)
     {
+        Logger.LogI($"Switch Page to {viewName}");
         CurrentPage = viewName switch
         {
             ViewNames.RepoDetails => new RepoDetailsViewModel(),
@@ -33,8 +36,20 @@ public class MainViewModel : ViewModelBase
         set
         {
             if (_hasUpdates == value) return;
-            
             _hasUpdates = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    private AppSettings _appSettings;
+
+    public AppSettings AppSettings
+    {
+        get => _appSettings;
+        set
+        {
+            if (_appSettings == value) return;
+            _appSettings = value;
             OnPropertyChanged();
         }
     }

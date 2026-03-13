@@ -1,7 +1,5 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -15,6 +13,7 @@ using Avalonia.Platform;
 using Github_Downloader_lib;
 using Github_Downloader_lib.Models;
 using Github_Downloader.Enums;
+using Github_Downloader.Models;
 using Github_Downloader.ViewModels;
 using SecretsLib;
 
@@ -37,10 +36,15 @@ public partial class HomeView : UserControl
         _repoDetailsViewModel = ((App)Application.Current!).RepoDetailsViewModel;
         _downloadStatusViewModel = ((App)Application.Current!).DownloadStatusViewModel;
         DataContext = _homeViewModel;
+        
+        _mainViewModel.AppSettings = AppSettings.Load();
     }
 
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)
     {
+        Console.WriteLine();
+        //((Window)sender).WindowState = _mainViewModel.AppSettings.WindowState;
+        
         PgbDownloading.DataContext = _downloadStatusViewModel;
         PgbDownloading.Bind(IsVisibleProperty, new Binding(nameof(_downloadStatusViewModel.IsUpdating)));
         

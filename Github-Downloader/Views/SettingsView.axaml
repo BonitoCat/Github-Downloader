@@ -5,13 +5,20 @@
              xmlns:viewModels="clr-namespace:Github_Downloader.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Github_Downloader.Views.SettingsView"
-             x:DataType="viewModels:SettingsViewModel">
+             x:DataType="viewModels:SettingsViewModel"
+             Loaded="Control_OnLoaded">
     
-    <Grid>
-        <StackPanel>
-            <Image Name="ImgBack" Source="../resources/arrow_back.png" Height="35" Width="35" PointerPressed="ImgBack_OnPointerPressed"/>
-            <Button Name="BtnImport" Content="Import" Click="BtnImport_OnClick"/>
-            <Button Name="BtnExport" Content="Export" Click="BtnExport_OnClick"/>
+    <StackPanel>
+        <Image Name="ImgBack" HorizontalAlignment="Left" Source="../resources/arrow_back.png" Height="35" Width="35" PointerPressed="ImgBack_OnPointerPressed"/>
+        <Button Name="BtnImport" Content="Import" Click="BtnImport_OnClick"/>
+        <Button Name="BtnExport" Content="Export" Click="BtnExport_OnClick"/>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Default start mode:"/>
+            <ComboBox Name="CobWindowState" SelectionChanged="CobWindowState_OnSelectionChanged">
+                <ComboBoxItem Content="Normal"/>
+                <ComboBoxItem Content="Maximized"/>
+                <ComboBoxItem Content="Fullscreen"/>
+            </ComboBox>
         </StackPanel>
-    </Grid>
+    </StackPanel>
 </UserControl>

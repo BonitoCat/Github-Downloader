@@ -11,10 +11,11 @@ namespace Github_Downloader_lib;
 
 public static class FileManager
 {
-    private static readonly string AppdataPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader");
-    private static readonly string ReposConfigFilePath = Path.Join(AppdataPath, "repos.json");
+    public static readonly string AppdataPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader");
+    public static readonly string ReposConfigFilePath = Path.Join(AppdataPath, "repos.json");
     public static readonly string CachePath = Path.Join(DirectoryHelper.GetCacheDirPath(), "github-downloader");
     public static readonly string AppImagesPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader", "app-images");
+    
     private static readonly byte[] Key = Encoding.UTF8.GetBytes("12345678901234567890123456789012");
     private static readonly byte[] IV = Encoding.UTF8.GetBytes("1234567890123456");
     

@@ -21,6 +21,7 @@ public partial class MainWindow : Window
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)
     {
         ((Window)sender).Title = $"Github Downloader - {AppInfo.Version}";
+        ((Window)sender).WindowState = _mainViewModel.AppSettings.WindowState;
     }
 
     private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
