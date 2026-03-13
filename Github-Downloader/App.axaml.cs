@@ -71,6 +71,7 @@ public partial class App : Application
         _appdataPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader");
         _reposConfigFilePath = Path.Join(_appdataPath, "repos.json");
         Logger.LogDir = Path.Join(_appdataPath, "logs");
+        Logger.LogToTerminal = true;
         //Logger.LogFirstChance = false;
         Logger.CreateFile();
         
