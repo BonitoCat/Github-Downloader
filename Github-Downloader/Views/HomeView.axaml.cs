@@ -45,6 +45,16 @@ public partial class HomeView : UserControl
         PgbDownloading.Bind(IsVisibleProperty, new Binding(nameof(_downloadStatusViewModel.IsUpdating)));
         
         LoadGrdTrackedRepos();
+        
+        bool hasUpdates = false;
+        foreach (Repo repo in UpdateManager.Repos)
+        {
+            if (repo.CurrentInstallTag != repo.Tag)
+            {
+                hasUpdates = true;
+            }
+        }
+        _mainViewModel.HasUpdates = hasUpdates;
     }
 
     private void SendNotification()
@@ -156,6 +166,16 @@ public partial class HomeView : UserControl
                 _downloadStatusViewModel.ProgressText = progressText;
             });
             _downloadStatusViewModel.IsUpdating = false;
+            
+            bool hasUpdates = false;
+            foreach (Repo repo in UpdateManager.Repos)
+            {
+                if (repo.CurrentInstallTag != repo.Tag)
+                {
+                    hasUpdates = true;
+                }
+            }
+            _mainViewModel.HasUpdates = hasUpdates;
             FileManager.SaveRepos();
         };
 
@@ -305,6 +325,16 @@ public partial class HomeView : UserControl
             _downloadStatusViewModel.StatusText = statusText;
         });
         _downloadStatusViewModel.IsUpdating = false;
+
+        bool hasUpdates = false;
+        foreach (Repo repo in UpdateManager.Repos)
+        {
+            if (repo.CurrentInstallTag != repo.Tag)
+            {
+                hasUpdates = true;
+            }
+        }
+        _mainViewModel.HasUpdates = hasUpdates;
         FileManager.SaveRepos();
     }
     

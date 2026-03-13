@@ -1,5 +1,3 @@
-using System.IO;
-using FileLib;
 using Github_Downloader.Enums;
 
 namespace Github_Downloader.ViewModels;
@@ -39,10 +37,5 @@ public class MainViewModel : ViewModelBase
             _hasUpdates = value;
             OnPropertyChanged();
         }
-    }
-
-    public MainViewModel()
-    {
-        
     }
 }
