@@ -24,6 +24,11 @@ public partial class SettingsView : UserControl
 
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)
     {
+        if (Design.IsDesignMode)
+        {
+            return;
+        }
+        
         CobWindowState.SelectedIndex = _mainViewModel.AppSettings.WindowState switch
         {
             WindowState.Normal => 0,
@@ -31,6 +36,9 @@ public partial class SettingsView : UserControl
             WindowState.FullScreen => 2,
             _ => 0
         };
+        
+        TglAutoCheckForUpdates.IsChecked = _mainViewModel.AppSettings.AutoCheckForUpdates;
+        NudAutoCheckForUpdatesInterval.Value = _mainViewModel.AppSettings.CheckForUpdatesInterval;
     }
 
     private async void BtnExport_OnClick(object? sender, RoutedEventArgs e)
@@ -97,5 +105,29 @@ public partial class SettingsView : UserControl
         };
         _mainViewModel.AppSettings.Save();
         Logger.LogI("Change default window state");
+    }
+
+    private void TglAutoCheckForUpdates_OnClick(object? sender, RoutedEventArgs e)
+    {
+        _mainViewModel.AppSettings.AutoCheckForUpdates = TglAutoCheckForUpdates.IsChecked == true;
+        _mainViewModel.AppSettings.Save();
+        if (_mainViewModel.AppSettings.AutoCheckForUpdates)
+        {
+            Logger.LogI("Enable auto check for updates");
+            _mainViewModel.AutoCheckForUpdatesTimer.Start();
+        }
+        else
+        {
+            Logger.LogI("Disable auto check for updates");
+            _mainViewModel.AutoCheckForUpdatesTimer.Stop();
+        }
+    }
+
+    private void NudAutoCheckForUpdatesInterval_OnValueChanged(object? sender, NumericUpDownValueChangedEventArgs e)
+    {
+        _mainViewModel.AppSettings.CheckForUpdatesInterval = (int) (NudAutoCheckForUpdatesInterval.Value ?? 0);
+        _mainViewModel.AppSettings.Save();
+        _mainViewModel.AutoCheckForUpdatesTimer.Interval = TimeSpan.FromMinutes(_mainViewModel.AppSettings.CheckForUpdatesInterval);
+        Logger.LogI($"Set auto check for updates interval to {_mainViewModel.AppSettings.CheckForUpdatesInterval}");
     }
 }

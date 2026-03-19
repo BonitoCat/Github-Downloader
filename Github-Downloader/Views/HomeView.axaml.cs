@@ -36,8 +36,6 @@ public partial class HomeView : UserControl
         _repoDetailsViewModel = ((App)Application.Current!).RepoDetailsViewModel;
         _downloadStatusViewModel = ((App)Application.Current!).DownloadStatusViewModel;
         DataContext = _homeViewModel;
-        
-        _mainViewModel.AppSettings = AppSettings.Load();
     }
 
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)

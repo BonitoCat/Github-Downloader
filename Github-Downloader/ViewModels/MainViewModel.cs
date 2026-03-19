@@ -1,3 +1,4 @@
+using Avalonia.Threading;
 using Github_Downloader.Enums;
 using Github_Downloader.Models;
 using LoggerLib;
@@ -53,4 +54,6 @@ public class MainViewModel : ViewModelBase
             OnPropertyChanged();
         }
     }
+    
+    public DispatcherTimer AutoCheckForUpdatesTimer { get; } = new();
 }

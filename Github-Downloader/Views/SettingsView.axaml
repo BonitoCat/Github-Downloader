@@ -12,13 +12,27 @@
         <Image Name="ImgBack" HorizontalAlignment="Left" Source="../resources/arrow_back.png" Height="35" Width="35" PointerPressed="ImgBack_OnPointerPressed"/>
         <Button Name="BtnImport" Content="Import" Click="BtnImport_OnClick"/>
         <Button Name="BtnExport" Content="Export" Click="BtnExport_OnClick"/>
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="Default start mode:"/>
+        <StackPanel Name="StpWindowState" Orientation="Horizontal">
+            <TextBlock Text="Default start mode:" VerticalAlignment="Center"/>
             <ComboBox Name="CobWindowState" SelectionChanged="CobWindowState_OnSelectionChanged">
                 <ComboBoxItem Content="Normal"/>
                 <ComboBoxItem Content="Maximized"/>
                 <ComboBoxItem Content="Fullscreen"/>
             </ComboBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Enable automatic check for Updates: " VerticalAlignment="Center"/>
+            <ToggleSwitch Name="TglAutoCheckForUpdates" OnContent="" OffContent="" Click="TglAutoCheckForUpdates_OnClick"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Auto check for updates interval (minutes): " VerticalAlignment="Center"/>
+            <NumericUpDown 
+                Name="NudAutoCheckForUpdatesInterval" 
+                HorizontalAlignment="Left"
+                Width="120" 
+                Minimum="1"
+                FormatString="F0"
+                ValueChanged="NudAutoCheckForUpdatesInterval_OnValueChanged"/>
         </StackPanel>
     </StackPanel>
 </UserControl>

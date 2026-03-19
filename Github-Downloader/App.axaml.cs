@@ -13,6 +13,7 @@ using FileLib;
 using Github_Downloader_lib;
 using Github_Downloader_lib.Models;
 using Github_Downloader.Enums;
+using Github_Downloader.Models;
 using Github_Downloader.ViewModels;
 using LoggerLib;
 using SecretsLib;
@@ -28,13 +29,10 @@ public partial class App : Application
     
     public MainWindow? MainWindow;
     private TrayIcon _trayIcon;
-    private DispatcherTimer _timer = new();
     
     private const string ResPath = "avares://Github-Downloader/resources/";
     private string _appdataPath;
     private string _reposConfigFilePath;
-    
-    private readonly int UpdateInterval = 5;
     
     public override void Initialize()
     {
@@ -68,6 +66,7 @@ public partial class App : Application
         {
             SecretsManager.Initialize("hofinga.gh-downloader.secret");
         }
+        MainViewModel.AppSettings = AppSettings.Load();
         
         _appdataPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader");
         _reposConfigFilePath = Path.Join(_appdataPath, "repos.json");
@@ -77,34 +76,37 @@ public partial class App : Application
         Logger.CreateFile();
         
         await FileManager.LoadRepos();
+        UpdateIcon();
 
-        _timer.Interval = TimeSpan.FromMinutes(UpdateInterval);
-        _timer.Tick += (_, _) =>
+        MainViewModel.AutoCheckForUpdatesTimer.Interval = TimeSpan.FromMinutes(MainViewModel.AppSettings.CheckForUpdatesInterval);
+        MainViewModel.AutoCheckForUpdatesTimer.Tick += (_, _) =>
         {
             if (MainWindow?.IsVisible == true)
             {
                 return;
             }
+
+            Logger.LogI("AutoCheckForUpdates");
             DownloadStatusViewModel.IsUpdating = true;
-            UpdateManager.SearchForUpdates(UpdateManager.Repos, statusText =>
-            {
-                DownloadStatusViewModel.StatusText = statusText;
-            });
-            DownloadStatusViewModel.IsUpdating = false;
             
-            bool hasUpdates = false;
-            foreach (Repo repo in UpdateManager.Repos)
-            {
-                if (repo.CurrentInstallTag != repo.Tag)
-                {
-                    hasUpdates = true;
-                    break;
-                }
-            }
-            MainViewModel.HasUpdates = hasUpdates;
+            UpdateIcon();
             FileManager.SaveRepos();
         };
-        _timer.Start();
+        MainViewModel.AutoCheckForUpdatesTimer.Start();
+    }
+
+    private void UpdateIcon()
+    {
+        bool hasUpdates = false;
+        foreach (Repo repo in UpdateManager.Repos)
+        {
+            if (repo.CurrentInstallTag != repo.Tag)
+            {
+                hasUpdates = true;
+                break;
+            }
+        }
+        MainViewModel.HasUpdates = hasUpdates;
     }
     
     private void InitializeTrayIcon()
