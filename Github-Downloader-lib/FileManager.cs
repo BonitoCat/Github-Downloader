@@ -1,6 +1,3 @@
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using FileLib;
 using Github_Downloader_lib.Models;
@@ -15,9 +12,6 @@ public static class FileManager
     public static readonly string ReposConfigFilePath = Path.Join(AppdataPath, "repos.json");
     public static readonly string CachePath = Path.Join(DirectoryHelper.GetCacheDirPath(), "github-downloader");
     public static readonly string AppImagesPath = Path.Join(DirectoryHelper.GetAppDataDirPath(), "github-downloader", "app-images");
-    
-    private static readonly byte[] Key = Encoding.UTF8.GetBytes("12345678901234567890123456789012");
-    private static readonly byte[] IV = Encoding.UTF8.GetBytes("1234567890123456");
     
     public static void SaveRepos()
     {
@@ -35,7 +29,7 @@ public static class FileManager
         File.WriteAllText(ReposConfigFilePath, jsonString);
     }
 
-    public static async Task LoadRepos(Action<string> statusText)
+    public static async Task LoadRepos()
     {
         DirectoryHelper.CreateDir(AppdataPath);
         DirectoryHelper.CreateDir(CachePath);
@@ -43,7 +37,7 @@ public static class FileManager
         
         if (File.Exists(ReposConfigFilePath))
         {
-            string jsonString = File.ReadAllText(ReposConfigFilePath);
+            string jsonString = await File.ReadAllTextAsync(ReposConfigFilePath);
             UpdateManager.Repos = JsonSerializer.Deserialize<List<Repo>>(jsonString);
         }
 
@@ -78,7 +72,7 @@ public static class FileManager
         }
         
         File.Copy(sourceFile, Path.Join(AppdataPath, "repos.json"), true);
-        LoadRepos(Console.WriteLine);
+        LoadRepos();
 
         foreach (Repo repo in UpdateManager.Repos)
         {

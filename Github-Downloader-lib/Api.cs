@@ -12,7 +12,10 @@ public static class Api
 {
     public static async Task<HttpResponseMessage> GetRequest(string url, string token = "")
     {
-        HttpClient client = new();
+        HttpClient client = new()
+        {
+            Timeout = TimeSpan.FromSeconds(10),
+        };
 
         if (!string.IsNullOrEmpty(token))
         {
@@ -20,7 +23,7 @@ public static class Api
                 new AuthenticationHeaderValue("Bearer", token);
         }
         
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Github-Downloader/1.0");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd($"Github-Downloader/{AppInfo.Version}");
 
         HttpResponseMessage response;
         try
@@ -42,7 +45,7 @@ public static class Api
         using HttpClient client = new();
 
         // GitHub still requires User-Agent
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Github-Downloader/1.0");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd($"Github-Downloader/{AppInfo.Version}");
         
         if (!string.IsNullOrEmpty(token))
         {
