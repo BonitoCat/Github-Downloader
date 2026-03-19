@@ -23,7 +23,7 @@ public static class Program
         
         UpdateManager.CurPlatform = Platform.Terminal;
         
-        await FileManager.LoadRepos(Console.WriteLine);
+        await FileManager.LoadRepos();
 
         if (args.Length == 0)
         {

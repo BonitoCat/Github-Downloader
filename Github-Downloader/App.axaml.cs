@@ -14,8 +14,8 @@ using Github_Downloader_lib;
 using Github_Downloader_lib.Models;
 using Github_Downloader.Enums;
 using Github_Downloader.ViewModels;
-using SecretsLib;
 using LoggerLib;
+using SecretsLib;
 
 namespace Github_Downloader;
 
@@ -28,6 +28,7 @@ public partial class App : Application
     
     public MainWindow? MainWindow;
     private TrayIcon _trayIcon;
+    private DispatcherTimer _timer = new();
     
     private const string ResPath = "avares://Github-Downloader/resources/";
     private string _appdataPath;
@@ -48,14 +49,14 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    public async override void OnFrameworkInitializationCompleted()
+    public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             
             InitializeTrayIcon();
-            await Start();
+            Start();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -75,17 +76,17 @@ public partial class App : Application
         //Logger.LogFirstChance = false;
         Logger.CreateFile();
         
-        await FileManager.LoadRepos(_ => {});
-        
-        DispatcherTimer timer = new();
-        timer.Tick += async (_, _) =>
+        await FileManager.LoadRepos();
+
+        _timer.Interval = TimeSpan.FromMinutes(UpdateInterval);
+        _timer.Tick += (_, _) =>
         {
             if (MainWindow?.IsVisible == true)
             {
                 return;
             }
             DownloadStatusViewModel.IsUpdating = true;
-            await UpdateManager.SearchForUpdates(UpdateManager.Repos, statusText =>
+            UpdateManager.SearchForUpdates(UpdateManager.Repos, statusText =>
             {
                 DownloadStatusViewModel.StatusText = statusText;
             });
@@ -97,13 +98,13 @@ public partial class App : Application
                 if (repo.CurrentInstallTag != repo.Tag)
                 {
                     hasUpdates = true;
+                    break;
                 }
             }
             MainViewModel.HasUpdates = hasUpdates;
             FileManager.SaveRepos();
         };
-        timer.Interval = TimeSpan.FromMinutes(UpdateInterval);
-        timer.Start();
+        _timer.Start();
     }
     
     private void InitializeTrayIcon()
