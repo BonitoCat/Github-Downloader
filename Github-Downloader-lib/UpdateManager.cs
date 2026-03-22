@@ -220,7 +220,7 @@ public static class UpdateManager
                 if (!asset.Value.Repo.SaveFileAnyway) continue;
             }
             else if (asset.Value.TempAssetPath.EndsWith(".exe") ||
-                     asset.Value.TempAssetPath.EndsWith(".exe"))
+                     asset.Value.TempAssetPath.EndsWith(".msi"))
             {
                 exes.Add(asset.Value.TempAssetPath);
                 if (!asset.Value.Repo.SaveFileAnyway) continue;

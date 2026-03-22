@@ -88,6 +88,11 @@ public partial class App : Application
 
             Logger.LogI("AutoCheckForUpdates");
             DownloadStatusViewModel.IsUpdating = true;
+            UpdateManager.SearchForUpdates(UpdateManager.Repos, statusText =>
+            {
+                DownloadStatusViewModel.StatusText = statusText;
+            });
+            DownloadStatusViewModel.IsUpdating = false;
             
             UpdateIcon();
             FileManager.SaveRepos();
