@@ -352,6 +352,16 @@ public partial class HomeView : UserControl
         });
         _downloadStatusViewModel.IsUpdating = false;
         FileManager.SaveRepos();
+        
+        bool hasUpdates = false;
+        foreach (Repo repo in UpdateManager.Repos)
+        {
+            if (repo.CurrentInstallTag != repo.Tag)
+            {
+                hasUpdates = true;
+            }
+        }
+        _mainViewModel.HasUpdates = hasUpdates;
     }
 
     private async void BtnSetPat_OnClick(object? sender, RoutedEventArgs e)
