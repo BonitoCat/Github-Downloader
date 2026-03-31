@@ -297,7 +297,7 @@ public static class UpdateManager
         string desktopFile = $"""
                              [Desktop Entry]
                              Name={asset.Repo.Name}
-                             Comment=Download {asset.Repo.Description}
+                             Comment={asset.Repo.Description}
                              GenericName={asset.Repo.Name}
                              Exec={asset.TempAssetPath}
                              Icon={iconPath}
