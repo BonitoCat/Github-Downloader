@@ -35,6 +35,8 @@ public static class FileManager
         DirectoryHelper.CreateDir(CachePath);
         DirectoryHelper.CreateDir(AppImagesPath);
         
+        ClearCache();
+        
         if (File.Exists(ReposConfigFilePath))
         {
             string jsonString = await File.ReadAllTextAsync(ReposConfigFilePath);
@@ -50,6 +52,21 @@ public static class FileManager
         
         await UpdateManager.UpdateRepoDetails(UpdateManager.Repos);
         SaveRepos();
+    }
+
+    private static void ClearCache()
+    {
+        Logger.LogI("Clearing cache");
+        
+        foreach (string file in Directory.GetFiles(CachePath))
+        {
+            File.Delete(file);
+        }
+
+        foreach (string dir in Directory.GetDirectories(CachePath))
+        {
+            Directory.Delete(dir, true);
+        }
     }
 
     public static void ExportRepoConfig(string destPath)
