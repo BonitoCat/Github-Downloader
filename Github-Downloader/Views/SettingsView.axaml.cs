@@ -125,7 +125,16 @@ public partial class SettingsView : UserControl
 
     private void NudAutoCheckForUpdatesInterval_OnValueChanged(object? sender, NumericUpDownValueChangedEventArgs e)
     {
-        _mainViewModel.AppSettings.CheckForUpdatesInterval = (int) (NudAutoCheckForUpdatesInterval.Value ?? 0);
+        if (NudAutoCheckForUpdatesInterval.Value == null)
+        {
+            return;
+        }
+        int interval = (int) (NudAutoCheckForUpdatesInterval.Value ?? 0);
+        if (interval < 1)
+        {
+            return;
+        }
+        _mainViewModel.AppSettings.CheckForUpdatesInterval = interval;
         _mainViewModel.AppSettings.Save();
         _mainViewModel.AutoCheckForUpdatesTimer.Interval = TimeSpan.FromMinutes(_mainViewModel.AppSettings.CheckForUpdatesInterval);
         Logger.LogI($"Set auto check for updates interval to {_mainViewModel.AppSettings.CheckForUpdatesInterval}");
