@@ -110,13 +110,13 @@ public static class Program
                 FileManager.SaveRepos();
                 
                 int count = 0;
-                foreach (var repo in UpdateManager.Repos)
+                UpdateManager.Repos.ForEach(repo =>
                 {
                     if (repo.Tag != repo.CurrentInstallTag)
                     {
                         count++;
                     }
-                }
+                });
                 Console.WriteLine($"{count} updates available execute {AppInfo.CliName} list to view details");
                 break;
             }
