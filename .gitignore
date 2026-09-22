@@ -69,6 +69,10 @@ builds/github-downloader-linux-x64-arch/opt/Github-Downloader/*
 !builds/github-downloader-linux-x64-arch/opt/Github-Downloader/.gitkeep
 builds/github-downloader-linux-x64-appimage/usr/bin/*
 !builds/github-downloader-linux-x64-appimage/usr/bin/.gitkeep
+builds/github-downloader-web-linux-arm64/opt/Github-Downloader-Web/*
+!builds/github-downloader-web-linux-arm64/opt/Github-Downloader-Web/.gitkeep
+builds/github-downloader-web-linux-x64/opt/Github-Downloader-Web/*
+!builds/github-downloader-web-linux-x64/opt/Github-Downloader-Web/.gitkeep
 
 builds/release-assets/*
 !builds/release-assets/.gitkeep
