@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Downloader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    <span>GitHub Downloader</span>
+                </div>
+                <div class="header-status">
+                    <span class="status-indicator" id="statusIndicator"></span>
+                    <span id="statusText">Connecting...</span>
+                    <span class="version" id="appVersion"></span>
+                </div>
+            </div>
+        </header>
+
+        <nav class="tabs" id="tabs">
+            <button class="tab active" data-tab="repositories">Repositories</button>
+            <button class="tab" data-tab="updates">Updates</button>
+            <button class="tab" data-tab="config">Configuration</button>
+            <button class="tab" data-tab="settings">Settings</button>
+        </nav>
+
+        <main class="main">
+            <!-- Repositories Tab -->
+            <section class="tab-panel active" id="repositories-panel">
+                <div class="panel-header">
+                    <h2>Repositories</h2>
+                    <button class="btn btn-primary" id="addRepoBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Add Repository
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="repo-table" id="repoTable">
+                        <thead>
+                            <tr>
+                                <th>Repository</th>
+                                <th>Current Version</th>
+                                <th>Latest Version</th>
+                                <th>Status</th>
+                                <th>Asset</th>
+                                <th>Download Path</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="repoTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="emptyRepos" style="display: none;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"></path></svg>
+                    <h3>No repositories yet</h3>
+                    <p>Add your first GitHub repository to start tracking releases</p>
+                    <button class="btn btn-primary" id="addFirstRepoBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Add Repository
+                    </button>
+                </div>
+            </section>
+
+            <!-- Updates Tab -->
+            <section class="tab-panel" id="updates-panel">
+                <div class="panel-header">
+                    <h2>Updates</h2>
+                    <div class="panel-actions">
+                        <button class="btn btn-secondary" id="checkAllUpdatesBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            Check All
+                        </button>
+                        <button class="btn btn-primary" id="downloadAllBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download All
+                        </button>
+                        <button class="btn btn-success" id="installAllBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Install All
+                        </button>
+                    </div>
+                </div>
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-header">
+                        <span id="progressTitle">Processing...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-details" id="progressDetails"></div>
+                </div>
+                <div class="table-container">
+                    <table class="repo-table" id="updatesTable">
+                        <thead>
+                            <tr>
+                                <th>Repository</th>
+                                <th>Current</th>
+                                <th>Available</th>
+                                <th>Assets</th>
+                                <th>Changelog</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="updatesTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="emptyUpdates" style="display: none;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    <h3>No updates available</h3>
+                    <p>All repositories are up to date</p>
+                </div>
+            </section>
+
+            <!-- Config Tab -->
+            <section class="tab-panel" id="config-panel">
+                <div class="panel-header">
+                    <h2>Configuration</h2>
+                </div>
+                <div class="config-grid">
+                    <div class="config-card">
+                        <h3>Export Configuration</h3>
+                        <p>Save your repository configuration to a JSON file</p>
+                        <div class="form-group">
+                            <label for="exportPath">Destination Path</label>
+                            <input type="text" id="exportPath" placeholder="/path/to/config.json" value="./github-downloader-config.json">
+                        </div>
+                        <button class="btn btn-primary" id="exportConfigBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Export
+                        </button>
+                    </div>
+                    <div class="config-card">
+                        <h3>Import Configuration</h3>
+                        <p>Load repository configuration from a JSON file</p>
+                        <div class="form-group">
+                            <label for="importPath">Source Path</label>
+                            <input type="text" id="importPath" placeholder="/path/to/config.json" value="./github-downloader-config.json">
+                        </div>
+                        <button class="btn btn-primary" id="importConfigBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            Import
+                        </button>
+                    </div>
+                </div>
+                <div class="config-card full-width">
+                    <h3>Current Configuration</h3>
+                    <pre class="config-preview" id="configPreview">Loading...</pre>
+                </div>
+            </section>
+
+            <!-- Settings Tab -->
+            <section class="tab-panel" id="settings-panel">
+                <div class="panel-header">
+                    <h2>Settings</h2>
+                </div>
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>GitHub Personal Access Token</h3>
+                        <p>Set a PAT to access private repositories and increase rate limits</p>
+                        <div class="form-group">
+                            <label for="patInput">Personal Access Token</label>
+                            <div class="input-with-toggle">
+                                <input type="password" id="patInput" placeholder="ghp_...">
+                                <button type="button" class="btn-icon" id="togglePatVisibility">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" id="savePatBtn">Save Token</button>
+                            <button class="btn btn-danger" id="removePatBtn">Remove Token</button>
+                        </div>
+                        <p class="hint">Token is stored securely in system keyring</p>
+                    </div>
+                    <div class="settings-card">
+                        <h3>Application Info</h3>
+                        <div class="info-list" id="appInfo">
+                            <div class="info-item"><span>Version</span><strong id="infoVersion">-</strong></div>
+                            <div class="info-item"><span>Repositories</span><strong id="infoRepoCount">-</strong></div>
+                            <div class="info-item"><span>Platform</span><strong id="infoPlatform">-</strong></div>
+                            <div class="info-item"><span>Data Directory</span><strong id="infoDataDir">-</strong></div>
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <h3>Danger Zone</h3>
+                        <p>These actions are irreversible</p>
+                        <button class="btn btn-danger" id="clearAllDataBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            Clear All Data
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <span>GitHub Downloader Web UI</span>
+            <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    
+    <div class="modal" id="addRepoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Repository</h3>
+                <button class="modal-close" id="closeAddRepoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Add by</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="addMethod" value="url" checked>
+                            <span>Repository URL</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="addMethod" value="name">
+                            <span>Owner/Name</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="urlMethodGroup">
+                    <label for="repoUrl">Repository URL</label>
+                    <input type="url" id="repoUrl" placeholder="https://github.com/owner/repo">
+                    <p class="hint">Full GitHub repository URL</p>
+                </div>
+                <div class="form-group" id="nameMethodGroup" style="display: none;">
+                    <div class="form-row">
+                        <div>
+                            <label for="repoOwner">Owner</label>
+                            <input type="text" id="repoOwner" placeholder="owner">
+                        </div>
+                        <div>
+                            <label for="repoName">Repository Name</label>
+                            <input type="text" id="repoName" placeholder="repo">
+                        </div>
+                    </div>
+                    <p class="hint">GitHub owner and repository name</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAddRepo">Cancel</button>
+                <button class="btn btn-primary" id="confirmAddRepo">Add Repository</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="repoDetailsModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="repoDetailsTitle">Repository Details</h3>
+                <button class="modal-close" id="closeRepoDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body" id="repoDetailsBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeRepoDetails">Close</button>
+                <button class="btn btn-primary" id="saveRepoDetails">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="changelogModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="changelogTitle">Changelog</h3>
+                <button class="modal-close" id="closeChangelogModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre class="changelog-content" id="changelogContent"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeChangelog">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

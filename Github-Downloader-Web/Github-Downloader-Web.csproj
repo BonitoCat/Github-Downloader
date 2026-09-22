@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Github_Downloader_Web</RootNamespace>
+    <NoWarn>CS8767;CS8600;CS8618;CS8602;CS8604;CS8601;CS4014</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Github-Downloader-lib\Github-Downloader-lib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FileLib">
+      <HintPath>..\libs\FileLib.dll</HintPath>
+    </Reference>
+    <Reference Include="LoggerLib">
+      <HintPath>..\libs\LoggerLib.dll</HintPath>
+    </Reference>
+    <Reference Include="SecretsLib">
+      <HintPath>..\libs\SecretsLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
