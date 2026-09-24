@@ -30,10 +30,11 @@ public static class Api
         {
             response = await client.GetAsync(url);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Console.WriteLine($"Invalid url: {url}");
-            Logger.LogI("Invalid url");
+            Console.WriteLine($"Exception in GetRequest for {url}: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+            Logger.LogI($"Invalid url or network error: {ex.Message}");
             response = null!;
         }
 

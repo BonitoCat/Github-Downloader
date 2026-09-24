@@ -102,8 +102,11 @@ public static class UpdateManager
         if (httpRepoResponse == null || !httpRepoResponse.IsSuccessStatusCode)
         {
             Logger.LogE($"Failed to fetch repo: {repoUrl}");
-            Logger.LogE(httpRepoResponse.StatusCode.ToString());
-            Logger.LogE(httpRepoResponse.ReasonPhrase);
+            if (httpRepoResponse != null)
+            {
+                Logger.LogE(httpRepoResponse.StatusCode.ToString());
+                Logger.LogE(httpRepoResponse.ReasonPhrase);
+            }
             return null;
         }
         
@@ -186,12 +189,17 @@ public static class UpdateManager
         }
         
         HttpResponseMessage httpResponse = await Api.GetRequest(responseUrl, SecretsManager.LookupSecret("pat"));
-        if (!httpResponse.IsSuccessStatusCode)
+        if (httpResponse == null || !httpResponse.IsSuccessStatusCode)
         {
             Console.WriteLine($"Failed to fetch release of: {responseUrl}");
-            Logger.LogE($"Failed to fetch release of: {responseUrl}");
-            Logger.LogE(httpResponse.StatusCode.ToString());
-            Logger.LogE(httpResponse.ReasonPhrase);
+            if (httpResponse != null)
+            {
+                Console.WriteLine($"HTTP Status: {httpResponse.StatusCode}");
+                Console.WriteLine($"HTTP Reason: {httpResponse.ReasonPhrase}");
+                Logger.LogE($"Failed to fetch release of: {responseUrl}");
+                Logger.LogE(httpResponse.StatusCode.ToString());
+                Logger.LogE(httpResponse.ReasonPhrase);
+            }
             return;
         }
         
